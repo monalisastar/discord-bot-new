@@ -8,16 +8,14 @@ from firebase_admin import credentials
 # Get the bot token from environment variables
 TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
-# Path to Firebase service account JSON file (hardcoded for Azure)
-cred_path = "/home/site/wwwroot/serviceAccount.json"
-
 # Initialize Firebase only if it's not already initialized
 if not firebase_admin._apps:
-    if os.path.exists(cred_path):
+    cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    if cred_path and os.path.exists(cred_path):
         cred = credentials.Certificate(cred_path)
         firebase_admin.initialize_app(cred)
     else:
-        print("❌ serviceAccount.json not found. Make sure it's uploaded to /home/site/wwwroot/.")
+        print("❌ serviceAccount.json not found. Make sure it's uploaded or set in environment variables.")
 
 # Set up bot with intents
 intents = discord.Intents.default()
