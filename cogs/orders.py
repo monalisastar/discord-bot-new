@@ -284,13 +284,123 @@ class ClaimRejectView(discord.ui.View):
         for button in self.children:
             button.disabled = True
 
+
+class OrderDeliveredView(discord.ui.View):
+    """View with an 'Order Delivered' button for the tutor."""
+    def __init__(self, ticket_channel, tutor, student):
+        super().__init__()
+        self.ticket_channel = ticket_channel
+        self.tutor = tutor
+        self.student = student
+
+    @discord.ui.button(label="Order Delivered", style=discord.ButtonStyle.green)
+    async def order_delivered(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles the Order Delivered button click by the tutor."""
+        if interaction.user != self.tutor:
+            await interaction.response.send_message("❌ Only the assigned tutor can mark the order as delivered.", ephemeral=True)
+            return
+
+        # Notify the student that the order has been delivered
+        await self.ticket_channel.send(f"✅ {self.tutor.mention} has delivered the order. {self.student.mention}, please review or close the ticket.")
+
+        # Add a button for the student to review or close the ticket
+        review_button = discord.ui.Button(label="Review Order", style=discord.ButtonStyle.blurple)
+        close_button = discord.ui.Button(label="Close Ticket", style=discord.ButtonStyle.red)
+
+        # View with Review/Close options
+        view = CloseTicketView(self.ticket_channel, self.student, self.tutor, review_button, close_button)
+        await self.ticket_channel.send("🔍 Review the delivered order or close the ticket.", view=view)
+
+        # Disable the button after the tutor clicks
+        for child in self.children:
+            if isinstance(child, discord.ui.Button) and child.label == "Order Delivered":
+                child.disabled = True
+        await interaction.message.edit(view=self)
+
+
+import discord
+from discord.ext import commands
+
+# Assuming bot is already initialized somewhere
+bot = commands.Bot(command_prefix="!")
+
+class CloseTicketView(discord.ui.View):
+    """View with 'Close Ticket' and 'Review Order' buttons for the student."""
+    def __init__(self, ticket_channel, student, tutor):
+        super().__init__()
+        self.ticket_channel = ticket_channel
+        self.student = student
+        self.tutor = tutor  # Store tutor here
+
+    @discord.ui.button(label="Review Order", style=discord.ButtonStyle.blurple)
+    async def review_order(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles the review order button."""
+        if interaction.user != self.student:
+            await interaction.response.send_message("❌ Only the student can leave a review.", ephemeral=True)
+            return
+
+        # Prompt the student to leave a review
+        await interaction.response.send_message(f"Please leave a rating and review for {self.tutor.mention}.", ephemeral=True)
+        
+        # Ask the student to leave their rating and review
+        await self.ticket_channel.send("Please leave your rating (1-5) and a detailed review about the tutor.")
+
+    @discord.ui.button(label="Close Ticket", style=discord.ButtonStyle.red)
+    async def close_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles the close ticket button."""
+        if interaction.user != self.student:
+            await interaction.response.send_message("❌ Only the student can close the ticket.", ephemeral=True)
+            return
+
+        await interaction.response.send_message(f"✅ Closing the ticket. Thanks for using our service, {self.student.mention}!", ephemeral=True)
+
+        # Closing ticket logic
+        await self.ticket_channel.send(f"🎉 {self.student.mention} has closed the ticket. The ticket is now closed.")
+        await self.ticket_channel.delete()
+
+
+@bot.event
+async def on_message(message):
+    # Assuming ticket_channel is properly initialized earlier
+    ticket_channel = discord.utils.get(message.guild.text_channels, name="ticket")  # Replace with your actual channel name
+
+    if message.channel.id == ticket_channel.id:
+        # Handle review submission
+        if message.content.startswith("Rating:"):
+            # Capture rating and review text properly
+            parts = message.content[len("Rating:"):].strip().split(" ", 1)
+            if len(parts) == 2:
+                rating = parts[0]  # Extract rating (e.g., 5)
+                review = parts[1]  # Extract review text
+            else:
+                await message.channel.send("❌ Please provide both a rating and a review after 'Rating:'.")
+                return
+
+            # Send the review to #review channel
+            review_channel = discord.utils.get(message.guild.text_channels, name="review")
+            if review_channel:
+                embed = discord.Embed(
+                    title=f"Review for {message.author.display_name}",  # Use message.author to get the student's name
+                    description=f"Rating: {rating}\nReview: {review}",
+                    color=discord.Color.blue()
+                )
+                await review_channel.send(embed=embed)
+                
+                # Optionally, thank the student
+                await message.channel.send("✅ Thank you for your feedback! The ticket will now be closed.")
+                
+                # Close the ticket
+                await message.channel.send(f"🎉 {message.author.mention} has left a review. Closing the ticket.")
+                await message.channel.delete()
+
+    # Ensure command processing works after handling custom logic
+    await bot.process_commands(message)
+
 # Command to send order button
 @commands.command()
 async def order(self, ctx):
     """Command to send an order button"""
     await ctx.send("Click below to create an order:", view=Orders.OrderButton(self.bot, ctx.author, self))
 
-async def setup(bot):
-    await bot.add_cog(Orders(bot))
 async def setup(bot):
     await bot.add_cog(Orders(bot))

@@ -42,12 +42,12 @@ class TicketSystem(commands.Cog):
             color=discord.Color.green()
         )
 
-        view = TicketButtons(self.bot)
-        await channel.send(embed=embed, view=view)
+        view = TicketButtons(self.bot)  # ✅ No indentation issue
+        await channel.send(embed=embed, view=view)  # ✅ Proper indentation
 
-class TicketButtons(discord.ui.View):
-    def __init__(self, bot):  # ✅ Fixed __init__ method
-        super().__init__()
+class TicketButtons(discord.ui.View):  # ✅ Ensure no extra space before class
+    def _init(self, bot):  # ✅ Fixed __init_ method
+        super()._init_()  # ✅ Corrected super() call
         self.bot = bot
 
     @discord.ui.button(label="Order Here", style=discord.ButtonStyle.green)
@@ -56,11 +56,11 @@ class TicketButtons(discord.ui.View):
         orders_cog = self.bot.get_cog("Orders")
         if orders_cog:
             await interaction.response.defer()  # Prevents "Interaction Failed"
-            print("✅ Orders cog found, proceeding with order creation...")
+            print(" Orders cog found, creating your order ticket...")
             await orders_cog.order(interaction)
         else:
-            print("⚠️ Orders cog not found! Check if cogs.orders is loaded properly.")
-            await interaction.response.send_message("Order system is currently unavailable.", ephemeral=True)
+            print(" Orders cog not found! Check if cogs.orders is loaded properly.")
+            await interaction.response.send_message("The order system is currently unavailable.", ephemeral=True)
 
     @discord.ui.button(label="Sign Up to Be a Tutor", style=discord.ButtonStyle.blurple)
     async def sign_up(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -68,10 +68,10 @@ class TicketButtons(discord.ui.View):
         tutor_cog = self.bot.get_cog("TutorSignup")
         if tutor_cog:
             await interaction.response.defer()  # Prevents "Interaction Failed"
-            print("✅ TutorSignup cog found, opening application...")
+            print(" TutorSignup cog found, opening the tutor application ticket...")
             await tutor_cog.sign_up(interaction)
         else:
-            print("⚠️ TutorSignup cog not found! Check if cogs.tutor_signup is loaded properly.")
+            print(" TutorSignup cog not found! Check if cogs.tutor_signup is loaded properly.")
             await interaction.response.send_message("Tutor sign-ups are not available at the moment.", ephemeral=True)
 
     @discord.ui.button(label="Report an Issue", style=discord.ButtonStyle.red)
@@ -79,12 +79,15 @@ class TicketButtons(discord.ui.View):
         """Handles user reports."""
         report_cog = self.bot.get_cog("ReportSystem")
         if report_cog:
-            await interaction.response.defer()  # Prevents "Interaction Failed"print("✅ ReportSystem cog found, opening a report ticket...")
+            await interaction.response.defer()  # Prevents "Interaction Failed"
+            print(" ReportSystem cog found, creating your report ticket...")
             await report_cog.report(interaction)
         else:
-            print("⚠️ ReportSystem cog not found! Check if cogs.report is loaded properly.")
-            await interaction.response.send_message("Report system is currently unavailable.", ephemeral=True)
+            print(" ReportSystem cog not found! Check if cogs.report is loaded properly.")
+            await interaction.response.send_message("The report system is currently unavailable.", ephemeral=True)
 
+#Ensure this is on a new line
 async def setup(bot):
     await bot.add_cog(TicketSystem(bot))
 
+       

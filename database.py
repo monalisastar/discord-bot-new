@@ -1,12 +1,15 @@
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, storage
 
 # Load Firebase credentials
 cred = credentials.Certificate("serviceAccount.json")
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred)  # No need to manually specify storageBucket
 
 # Get Firestore database instance
 db = firestore.client()
+
+# Get Firebase Storage bucket instance (Automatically retrieves the default bucket)
+bucket = storage.bucket()  
 
 # Function to create a new ticket in Firestore
 def create_ticket(user_id, username, ticket_number, channel_id):
