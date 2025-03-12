@@ -1,10 +1,10 @@
 import discord
 from discord.ext import commands
 import asyncio
-from database import db  # Firestore from database.py
+from database import db, bucket  # Import Firestore and Storage from database.py
+
 import re  # Regular expressions for currency parsing
 
-# Constants
 # Constants
 TRUSTED_TUTOR_ROLE = "Trusted tutor"
 TUTOR_CHAT_CHANNEL = "tutor-chat"

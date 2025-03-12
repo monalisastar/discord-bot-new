@@ -6,11 +6,6 @@ from .orders import Orders  # Ensure this is correctly imported
 # Constants
 PAID_HELP_TEST_CHANNEL = "paid-help-test"  # For testing
 PAID_HELP_CHANNEL = "paid-help"  # Main channel
-import discord
-from discord.ext import commands
-
-PAID_HELP_TEST_CHANNEL = "paid-help-test"
-PAID_HELP_CHANNEL = "paid-help"
 
 class TicketSystem(commands.Cog):
     def __init__(self, bot):
