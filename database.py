@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials, firestore, storage
+from firebase_admin import credentials, firestore
 import os
 
 # Use absolute path for serviceAccount.json
@@ -10,15 +10,10 @@ cred_path = os.path.join(BASE_DIR, "serviceAccount.json")  # Full path
 if not firebase_admin._apps:
     # Load Firebase credentials
     cred = credentials.Certificate(cred_path)
-    
-    # Initialize Firebase app **with storage bucket explicitly set**
-    firebase_admin.initialize_app(cred, {"storageBucket": f"{cred.project_id}.appspot.com"})
+    firebase_admin.initialize_app(cred)
 
 # Get Firestore database instance
 db = firestore.client()
-
-# Get Firebase Storage bucket instance
-bucket = storage.bucket()  # Automatically uses default bucket
 
 # Function to create a new ticket in Firestore
 def create_ticket(user_id, username, ticket_number, channel_id):
