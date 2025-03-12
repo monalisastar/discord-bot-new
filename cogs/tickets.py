@@ -6,6 +6,11 @@ from .orders import Orders  # Ensure this is correctly imported
 # Constants
 PAID_HELP_TEST_CHANNEL = "paid-help-test"  # For testing
 PAID_HELP_CHANNEL = "paid-help"  # Main channel
+import discord
+from discord.ext import commands
+
+PAID_HELP_TEST_CHANNEL = "paid-help-test"
+PAID_HELP_CHANNEL = "paid-help"
 
 class TicketSystem(commands.Cog):
     def __init__(self, bot):
@@ -14,6 +19,7 @@ class TicketSystem(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """Automatically send ticket embed when bot starts."""
+        print("🔄 Bot has restarted. Checking for ticket system...")
         for guild in self.bot.guilds:
             channel = discord.utils.get(guild.text_channels, name=PAID_HELP_TEST_CHANNEL)  # Use test channel
             if channel:
@@ -48,6 +54,7 @@ class TicketSystem(commands.Cog):
     @commands.command(name="send_tickets_test")
     async def send_tickets_test(self, ctx):
         """Manually send ticket embed to #paid-help-test."""
+        print("📤 Manually sending ticket embed to test channel...")
         channel = discord.utils.get(ctx.guild.text_channels, name=PAID_HELP_TEST_CHANNEL)
         if channel:
             await self.send_ticket_embed(channel)
@@ -58,12 +65,14 @@ class TicketSystem(commands.Cog):
     @commands.command(name="send_tickets_main")
     async def send_tickets_main(self, ctx):
         """Manually send ticket embed to #paid-help (main channel)."""
+        print("📤 Manually sending ticket embed to main channel...")
         channel = discord.utils.get(ctx.guild.text_channels, name=PAID_HELP_CHANNEL)
         if channel:
             await self.send_ticket_embed(channel)
             await ctx.send("✅ Ticket system sent to #paid-help!", delete_after=5)
         else:
-            await ctx.send("⚠️ Main ticket channel not found!", delete_after=5)
+            await ctx.send("⚠️Main ticket channel not found!", delete_after=5)
+
 
 class TicketButtons(discord.ui.View):
     def __init__(self, bot):
@@ -88,7 +97,7 @@ class TicketButtons(discord.ui.View):
         tutor_cog = self.bot.get_cog("TutorSignup")
         await interaction.response.defer()
         if tutor_cog:
-            print("✅TutorSignup cog found, opening tutor application...")
+            print("✅ TutorSignup cog found, opening tutor application...")
             await tutor_cog.sign_up(interaction)
         else:
             print("⚠️ TutorSignup cog not found! Check if it's loaded properly.")
@@ -105,6 +114,7 @@ class TicketButtons(discord.ui.View):
         else:
             print("⚠️ ReportSystem cog not found! Check if it's loaded properly.")
             await interaction.followup.send("The report system is currently unavailable.", ephemeral=True)
+
 
 async def setup(bot):
     await bot.add_cog(TicketSystem(bot))
