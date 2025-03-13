@@ -5,7 +5,7 @@ from .orders import Orders  # Ensure this is correctly imported
 
 # Constants
 PAID_HELP_TEST_CHANNEL = "paid-help-test"  # For testing
-PAID_HELP_CHANNEL = "paid-help"  # Main channel
+PAID_HELP_CHANNEL = "📚paid-help💰"  # Updated to match exact channel name
 
 class TicketSystem(commands.Cog):
     def __init__(self, bot):
@@ -16,12 +16,12 @@ class TicketSystem(commands.Cog):
         """Automatically send ticket embed when bot starts."""
         print("🔄 Bot has restarted. Checking for ticket system...")
         for guild in self.bot.guilds:
-            channel = discord.utils.get(guild.text_channels, name=PAID_HELP_TEST_CHANNEL)  # Use test channel
+            channel = discord.utils.get(guild.text_channels, name=PAID_HELP_CHANNEL)  # Use main channel
             if channel:
                 await self.send_ticket_embed(channel)
                 print(f"✅ Ticket embed sent in {channel.name}")
             else:
-                print(f"⚠️ {PAID_HELP_TEST_CHANNEL} not found!")
+                print(f"⚠️ {PAID_HELP_CHANNEL} not found!")
 
     async def send_ticket_embed(self, channel):
         """Sends the ticket embed with buttons."""
@@ -66,7 +66,7 @@ class TicketSystem(commands.Cog):
             await self.send_ticket_embed(channel)
             await ctx.send("✅ Ticket system sent to #paid-help!", delete_after=5)
         else:
-            await ctx.send("⚠️ Main ticket channel not found!", delete_after=5)
+            await ctx.send(f"⚠️ Main ticket channel `{PAID_HELP_CHANNEL}` not found!", delete_after=5)
 
 
 class TicketButtons(discord.ui.View):
@@ -113,6 +113,3 @@ class TicketButtons(discord.ui.View):
 
 async def setup(bot):
     await bot.add_cog(TicketSystem(bot))
-
-
-       
