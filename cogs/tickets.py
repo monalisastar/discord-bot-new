@@ -57,8 +57,10 @@ class TicketSystem(commands.Cog):
         else:
             await ctx.send("⚠️ Test ticket channel not found!", delete_after=5)
 
-    @commands.command(name="send_tickets_main")
-    async def send_tickets_main(self, ctx):
+    PAID_HELP_CHANNEL_ID = 1046703224691900557  # Use the actual channel ID
+
+@commands.command(name="send_tickets_main")
+async def send_tickets_main(self, ctx):
         """Manually send ticket embed to #paid-help (main channel)."""
         print("📤 Manually sending ticket embed to main channel...")
         channel = discord.utils.get(ctx.guild.text_channels, name=PAID_HELP_CHANNEL)
@@ -66,7 +68,7 @@ class TicketSystem(commands.Cog):
             await self.send_ticket_embed(channel)
             await ctx.send("✅ Ticket system sent to #paid-help!", delete_after=5)
         else:
-            await ctx.send("⚠️Main ticket channel not found!", delete_after=5)
+            await ctx.send("⚠Main ticket channel not found!", delete_after=5)
 
 
 class TicketButtons(discord.ui.View):
