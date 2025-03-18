@@ -137,13 +137,13 @@ class Orders(commands.Cog):
 
         # Check for rate limit (e.g., user spamming orders)
         if not await self.rate_limit_check(user.id):
-            await interaction.response.send_message("⚠️ You need to wait a while before creating another order.", ephemeral=True)
+            await interaction.followup.send("⚠️ You need to wait a while before creating another order.", ephemeral=True)
             return
 
         # Get the ticket category
         category = discord.utils.get(guild.categories, id=TICKET_CATEGORY_ID)
         if not category:
-            await interaction.response.send_message("⚠️ Ticket category not found! Please contact an admin.", ephemeral=True)
+            await interaction.followup.send("⚠️ Ticket category not found! Please contact an admin.", ephemeral=True)
             return
 
         ticket_name = f"order-{user.name}".replace(" ", "-").lower()
@@ -157,7 +157,7 @@ class Orders(commands.Cog):
         try:
             ticket_channel = await guild.create_text_channel(ticket_name, category=category, overwrites=overwrites)
         except discord.Forbidden as e:
-            await interaction.response.send_message("⚠️ Insufficient permissions to create the ticket channel.", ephemeral=True)
+            await interaction.followup.send("⚠️ Insufficient permissions to create the ticket channel.", ephemeral=True)
             logging.error(f"Permission error when creating ticket channel: {e}")
             return
 
@@ -172,7 +172,7 @@ class Orders(commands.Cog):
             await ticket_channel.send(embed=welcome_embed)
         except Exception as e:
             logging.error(f"Error sending welcome message: {e}")
-            await interaction.response.send_message(f"⚠️ Error sending welcome message: {str(e)}", ephemeral=True)
+            await interaction.followup.send(f"⚠️ Error sending welcome message: {str(e)}", ephemeral=True)
             return
 
         await self.ask_order_questions(user, ticket_channel)
@@ -326,22 +326,3 @@ class SatisfiedButtonView(discord.ui.View):
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Orders(bot))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
